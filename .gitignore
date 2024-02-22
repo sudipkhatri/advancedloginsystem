@@ -1,0 +1,10 @@
+# backend
+backend/.env
+/backend/.env
+./backend/.env
+
+backend/.gitignore
+/backend/.gitignore
+./backend/.gitignore
+
+# frontend
