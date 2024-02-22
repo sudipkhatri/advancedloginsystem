@@ -3,6 +3,7 @@ import cors from "cors";
 import mongoose from "mongoose";
 import userRouter from "./Routes/userRoute.js";
 import cookieParser from "cookie-parser";
+import "dotenv/config.js"
 
 const app = express();
 
@@ -19,13 +20,10 @@ app.use(
 app.use(cookieParser());
 app.use(express.urlencoded({ extended: true }));
 app.use("/api/users", userRouter);
-
 const port = 5001;
 
 mongoose
-  .connect(
-    "mongodb+srv://sudpkhatri4:hello123@loginapp.6or7fr4.mongodb.net/?retryWrites=true&w=majority"
-  )
+  .connect(process.env.DB_URL)
   .then(() => {
     app.listen(port, () => {
       console.log("listening to port:", port);
