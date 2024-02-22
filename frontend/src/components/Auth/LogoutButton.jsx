@@ -3,6 +3,7 @@ import { logout } from "../../api/handleApis";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store";
+import { toast } from "react-toastify";
 
 const SignOutButton = () => {
   const navigate = useNavigate();
@@ -11,11 +12,12 @@ const SignOutButton = () => {
   const mutation = useMutation(logout, {
     onSuccess: async () => {
       await queryClient.invalidateQueries("validateToken");
-      alert("logout success");
+      toast.success("Logout success")
       navigate("/");
       dispatch(authActions.logout());
     },
     onError: async (error) => {
+      toast.error(error);
       console.log(error);
     },
   });

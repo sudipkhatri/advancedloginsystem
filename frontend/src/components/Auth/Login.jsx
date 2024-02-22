@@ -1,11 +1,11 @@
 import { useMutation } from "react-query";
 import { useState } from "react";
-import { useSelector } from "react-redux";
 import { login } from "../../api/handleApis";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store";
+import { toast } from "react-toastify";
 
 const Login = () => {
   const dispatch = useDispatch();
@@ -36,9 +36,10 @@ const Login = () => {
     onMutate: () => {},
     onSuccess: (data) => {
       if (data) {
+        toast.success("Login success.");
         navigate("/user");
         localStorage.setItem("token", JSON.stringify(data.token));
-        dispatch(authActions.login({}))
+        dispatch(authActions.login({}));
       } else {
         navigate("/login");
         seMsg(true);
@@ -53,7 +54,7 @@ const Login = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center min-h-[90vh]">
+      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh]">
         <div className="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             <span className="bg-gradient-to-r text-transparent from-blue-500 to-teal-500 bg-clip-text">

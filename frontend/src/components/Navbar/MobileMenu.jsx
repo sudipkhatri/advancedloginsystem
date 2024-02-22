@@ -3,32 +3,17 @@ import { useSelector } from "react-redux";
 import { AiOutlineMenu } from "react-icons/ai";
 import { RxCross2 } from "react-icons/rx";
 import { NavLink as Link } from "react-router-dom";
+import { protectedNav, publicNav } from "./list";
 
 const MobileMenu = ({ isMenuOpen, onMenuToggle }) => {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
-  const [isScrolled, setIsScrolled] = useState(false);
-  useEffect(() => {
-    const handleScroll = () => {
-      if (window.scrollY > 1) {
-        setIsScrolled(true);
-      } else {
-        setIsScrolled(false);
-      }
-    };
-    window.addEventListener("scroll", handleScroll);
-    return () => {
-      window.removeEventListener("scroll", handleScroll);
-    };
-  }, []);
 
   return (
-    <div className="md:hidden flex justify-center mt-3 w-full">
-      <div className="absolute z-10 top-23 w-full">
+    <div className="md:hidden flex justify-center mt-3 w-screen overflow-hidden">
+      <div className="absolute z-10 top-0 left-0 w-screen">
         <button
           onClick={onMenuToggle}
-          className={`fixed top-0 right-0 duration-300 m-4 ${
-            isScrolled ? "hidden" : ""
-          }`}
+          className={`fixed top-0 right-0 duration-300 m-4`}
         >
           {isMenuOpen ? (
             <RxCross2 size={"30px"} />
@@ -38,55 +23,39 @@ const MobileMenu = ({ isMenuOpen, onMenuToggle }) => {
         </button>
 
         {isMenuOpen && (
-          <div className="flex flex-col bg-gray-100 shadow-lg leading-9 font-bold min-h-[60vh] h-auto pt-3">
-            <div
-              className="
-              flex flex-col 
-              bg-gray-100 shadow-lg  min-h-[80vh] h-auto pt-3"
-            >
-              {isLoggedIn ? (
-                <Link
-                  onClick={onMenuToggle}
-                  to="/user"
-                  className="block p-2 pl-5 cursor-pointer hover:bg-indigo-600 duration-400 ease-in hover:text-white"
-                >
-                  Profile
-                </Link>
+          <div className="flex flex-col px-4 bg-teal-300 shadow-lg leading-9 font-bold h-screen pt-6">
+            <div className=" flex gap-3 flex-col bg-teal-300 h-auto pt-6 mt-4">
+              {!isLoggedIn ? (
+                publicNav?.map((list) => {
+                  const { id, name, url } = list;
+                  return (
+                    <Link
+                      key={id}
+                      onClick={onMenuToggle}
+                      to={url}
+                      className="w-fit rounded text-lg px-5 cursor-pointer hover:underline underline-offset-4 duration-400 ease-in"
+                    >
+                      {name}
+                    </Link>
+                  );
+                })
               ) : (
-                <Link
-                  onClick={onMenuToggle}
-                  to="/"
-                  className="block p-2 pl-5 cursor-pointer hover:bg-indigo-600 duration-400 ease-in hover:text-white"
-                >
-                  Home
-                </Link>
-              )}
-              {isLoggedIn ? (
-                <Link
-                  onClick={onMenuToggle}
-                  to="/logout"
-                  className="block p-2 pl-5 hover:bg-indigo-600 duration-400 ease-in hover:text-white"
-                >
-                  Logout
-                </Link>
-              ) : (
-                <Link
-                  onClick={onMenuToggle}
-                  to="/login"
-                  className="block p-2 pl-5 hover:bg-indigo-600 duration-400 ease-in hover:text-white"
-                >
-                  Login
-                </Link>
-              )}
-
-              {!isLoggedIn && (
-                <Link
-                  onClick={onMenuToggle}
-                  to="/register"
-                  className="block p-2 pl-5 hover:bg-indigo-600 duration-400 ease-in hover:text-white duration-3000 "
-                >
-                  Register
-                </Link>
+                <>
+                  {protectedNav?.map((items) => {
+                    const { id, name, url } = items;
+                    return (
+                      <Link
+                        key={id}
+                        onClick={onMenuToggle}
+                        to={url}
+                        className="w-fit p-2 rounded text-center px-5 cursor-pointer hover:bg-indigo-600 duration-400 ease-in"
+                      >
+                        {name}
+                      </Link>
+                    );
+                  })}
+                  <SignOutButton />
+                </>
               )}
             </div>
           </div>

@@ -4,6 +4,7 @@ import { register } from "../../api/handleApis";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
+import { authActions } from "../../store";
 
 const Register = () => {
   const [passError, setPassError] = useState("");
@@ -35,7 +36,8 @@ const Register = () => {
     onMutate: () => {},
     onSuccess: (data) => {
       if (data) {
-        navigate("/welcome");
+        navigate("/user");
+        localStorage.setItem("token", JSON.stringify(data.token));
         dispatch(authActions.login({}));
       } else {
         // navigate("/register");
@@ -54,7 +56,6 @@ const Register = () => {
     const isValidEmail = emailRegex.test(input.email);
     if (input.password.length <= 6) {
       setPassError("Password must be greater than 6 character");
-      return;
     } else if (input.password !== input.confirmPassword) {
       setPassError("Password doesn't match");
       return;
@@ -68,7 +69,7 @@ const Register = () => {
 
   return (
     <>
-      <div className="flex justify-center items-center min-h-[90vh]">
+      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh]">
         <div className="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             <span className="bg-gradient-to-r text-transparent from-blue-500 to-teal-500 bg-clip-text">
@@ -162,11 +163,6 @@ const Register = () => {
               >
                 SignUp
               </button>
-            </div>
-            <div className="text-center mt-4">
-              <a href="#" className="text-gray-600 hover:underline">
-                Forgot password?
-              </a>
             </div>
           </form>
           <p className="text-center text-gray-600 mt-6">
