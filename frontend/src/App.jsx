@@ -17,35 +17,27 @@ function App() {
   const isLoggedIn = useSelector((state) => state.isLoggedIn);
   useEffect(() => {
     const token = localStorage.getItem("token");
-    if (token) {
+    if (token && token!==undefined) {
+      console.log(token);
       dispatch(authActions.login());
     }
   }, [dispatch]);
-  //console.log(isLoggedIn);
+  console.log(isLoggedIn);
   return (
     <>
       <ToastContainer />
       <Routes>
         {isLoggedIn ? (
           <>
-            <Route path="/user" element={<Layout children={<Welcome />} />} />
-            <Route
-              path="*"
-              element={<Layout children={<> Error Handling </>} />}
-            />
+            <Route path="/user" element={<Layout> <Welcome/> </Layout>} />
+            <Route path="*" element={<Layout> <>Error Div</> </Layout>} />
           </>
         ) : (
           <>
-            <Route path="/" element={<Layout children={<Home/>} />} />
-            <Route path="/login" element={<Layout children={<Login />} />} />
-            <Route
-              path="/register"
-              element={<Layout children={<Register />} />}
-            />
-            <Route
-              path="*"
-              element={<Layout children={<> Error Handling </>} />}
-            />
+            <Route path="/" element={<Layout> <Home/> </Layout>} />
+            <Route path="/login" element={<Layout> <Login/> </Layout>} />
+            <Route path="/register" element={<Layout> <Register/> </Layout>} />
+            <Route path="*" element={<Layout> <>Error Div</> </Layout>} />
           </>
         )}
       </Routes>

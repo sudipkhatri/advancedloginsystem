@@ -24,20 +24,16 @@ export const register = async (req, res) => {
       password: hashPassword,
     });
     await user.save();
-    const token = jwt.sign(
-      { userID: user._id },
-      process.env.JWT_SECRET_KEY,
-      {
-        expiresIn: "1d",
-      }
-    );
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET_KEY, {
+      expiresIn: "1d",
+    });
     res.cookie("auth_token", token, {
       httpOnly: true, //it means the cookie only available in http and not https
       secure: false,//process.env.NODE_ENV === "production", //for local host it should be false
       maxAge: 86400000,
       //expiresIn: new Date(Date.now() + 1000 * 30), //30s
     });
-    return res.status(201).json({ message: "user registration success" });
+    return res.status(201).json({ message: "user registration success", token: token });
   } catch (error) {
     return res.status(500).json({ message: "Something Went Wrong!" });
   }
@@ -72,7 +68,7 @@ export const login = async (req, res) => {
       maxAge: 86400000,
       //expiresIn: new Date(Date.now() + 1000 * 30), //30s
     });
-    res.status(200).json({ token: token });
+    return res.status(200).json({ token: token });
   } catch (error) {
     console.log(error);
     return res.status(500).json({ message: "Something went wrong!" });
@@ -86,9 +82,6 @@ export const logout = async (req, res) => {
   return res.status(200).json({ message: "logged out succesfully" });
 };
 
-export const getUser = async (req, res) => {
-  return res.status(200).json({ message: "user logged in" });
-};
 
 export const verifyToken = async (req,res,next) => {
   const token = await req.cookies["auth_token"];
@@ -106,7 +99,6 @@ export const verifyToken = async (req,res,next) => {
 
 export const getInfo = async (req, res) => {
   const userId = req.userId;
-
   try {
     const user = await User.findById(userId).select("-password");
     if(!user){

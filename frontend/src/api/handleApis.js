@@ -1,5 +1,6 @@
 import axios from "axios";
 
+// handle user apis
 const handleApis = axios.create({
   withCredentials: true, //to store cookie on browser
   baseURL: "http://localhost:5001/api/users",
@@ -31,7 +32,6 @@ export const register = async (input) => {
   try {
     const res = await handleApis.post(`/register`, input);
     const data = await res.data;
-    console.log("data is", data);
     return data;
   } catch (error) {
     if (

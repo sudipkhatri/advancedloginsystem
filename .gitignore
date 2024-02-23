@@ -7,4 +7,9 @@ backend/.gitignore
 /backend/.gitignore
 ./backend/.gitignore
 
+
+.gitignore
+/.gitignore
+
+
 # frontend

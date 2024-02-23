@@ -1,14 +1,13 @@
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useState } from "react";
 import { register } from "../../api/handleApis";
 import { Link } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { useDispatch } from "react-redux";
 import { authActions } from "../../store";
+import { toast } from "react-toastify";
 
 const Register = () => {
-  const [passError, setPassError] = useState("");
-  const [emailError, setemailError] = useState("");
   const navigate = useNavigate();
   const [input, setInput] = useState({
     name: "",
@@ -16,6 +15,8 @@ const Register = () => {
     password: "",
     confirmPassword: "",
   });
+
+  const queryClient = useQueryClient();
   const dispatch = useDispatch();
 
   const handleChange = (e) => {
@@ -25,28 +26,20 @@ const Register = () => {
     }));
   };
 
-  const {
-    mutate,
-    isError: isLoginError,
-    isPending,
-    error: loginError,
-    reset,
-  } = useMutation({
-    mutationFn: register,
-    onMutate: () => {},
-    onSuccess: (data) => {
+  const mutation = useMutation(register, {
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries("validateToken");
       if (data) {
-        navigate("/user");
+        console.log(data);
         localStorage.setItem("token", JSON.stringify(data.token));
         dispatch(authActions.login({}));
-      } else {
-        // navigate("/register");
-        console.log("error");
+        toast.success("Registration success.");
+        navigate("/user");
       }
+      return;
     },
-    onError: (error) => {
-      console.log(error.message);
-      setemailError(error.message);
+    onError: async (error) => {
+      toast.error(error.message);
     },
   });
 
@@ -55,21 +48,19 @@ const Register = () => {
     const emailRegex = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,}$/i;
     const isValidEmail = emailRegex.test(input.email);
     if (input.password.length <= 6) {
-      setPassError("Password must be greater than 6 character");
+      return toast.error("Password must be greater than 6 character");
     } else if (input.password !== input.confirmPassword) {
-      setPassError("Password doesn't match");
-      return;
+      return toast.error("Password doesn't match");
     } else if (!isValidEmail) {
-      setemailError("Invalid email!");
-      return;
+      return toast.error("Invalid email!");
     } else {
-      mutate(input);
+      return mutation.mutate(input);
     }
   };
 
   return (
     <>
-      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh]">
+      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh] py-4">
         <div className="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             <span className="bg-gradient-to-r text-transparent from-blue-500 to-teal-500 bg-clip-text">
@@ -116,7 +107,6 @@ const Register = () => {
                 />
               </div>
             </div>
-            {emailError && <span className="text-red-600"> {emailError} </span>}
             <div className="mb-6 mt-1">
               <label
                 htmlFor="password"
@@ -155,7 +145,6 @@ const Register = () => {
                 />
               </div>
             </div>
-            {passError && <span className="text-red-600">{passError}</span>}
             <div className="flex mt-1 items-center justify-center">
               <button
                 type="submit"

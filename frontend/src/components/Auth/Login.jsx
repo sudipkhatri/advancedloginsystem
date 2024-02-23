@@ -1,4 +1,4 @@
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 import { useState } from "react";
 import { login } from "../../api/handleApis";
 import { Link } from "react-router-dom";
@@ -9,6 +9,7 @@ import { toast } from "react-toastify";
 
 const Login = () => {
   const dispatch = useDispatch();
+  const queryClient = useQueryClient();
   const [input, setInput] = useState({
     email: "",
     password: "",
@@ -25,16 +26,9 @@ const Login = () => {
     }));
   };
 
-  const {
-    mutate,
-    isError: isLoginError,
-    isPending,
-    error: loginError,
-    reset,
-  } = useMutation({
-    mutationFn: login,
-    onMutate: () => {},
-    onSuccess: (data) => {
+  const mutation = useMutation(login, {
+    onSuccess: async (data) => {
+      await queryClient.invalidateQueries("validateToken");
       if (data) {
         toast.success("Login success.");
         navigate("/user");
@@ -45,16 +39,42 @@ const Login = () => {
         seMsg(true);
       }
     },
+    onError: async (error) => {
+      toast({ message: error.message });
+    },
   });
+
+  // const {
+  //   mutate,
+  //   isError: isLoginError,
+  //   isPending,
+  //   error: loginError,
+  //   reset,
+  // } = useMutation({
+  //   mutationFn: login,
+  //   onMutate: () => {},
+  //   onSuccess: (data) => {
+  //     if (data) {
+  //       toast.success("Login success.");
+  //       navigate("/user");
+  //       localStorage.setItem("token", JSON.stringify(data.token));
+  //       dispatch(authActions.login({}));
+  //     } else {
+  //       navigate("/login");
+  //       seMsg(true);
+  //     }
+  //   },
+  // });
 
   const handleSubmit = (e) => {
     e.preventDefault();
-    mutate(input);
+    mutation.mutate(input);
+    //mutate(input);
   };
 
   return (
     <>
-      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh]">
+      <div className="flex bg-teal-400 justify-center items-center min-h-[90vh] py-4">
         <div className="bg-white shadow-lg rounded px-8 pt-6 pb-8 mb-4 w-full max-w-md">
           <h2 className="text-3xl font-bold mb-6 text-center text-white">
             <span className="bg-gradient-to-r text-transparent from-blue-500 to-teal-500 bg-clip-text">

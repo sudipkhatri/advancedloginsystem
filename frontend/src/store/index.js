@@ -8,12 +8,11 @@ const authSlice = createSlice({
       state.isLoggedIn = true;
     },
     logout(state) {
-      localStorage.removeItem("token")
+      localStorage.removeItem("token");
       state.isLoggedIn = false;
     },
   },
 });
-
 
 export const authActions = authSlice.actions;
 
